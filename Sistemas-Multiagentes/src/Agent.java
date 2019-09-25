@@ -1,5 +1,5 @@
 
-/* Clase agente encargada de recopilar informacion de la web */
+/* Agent to get web data */
 
 import java.io.IOException;
 

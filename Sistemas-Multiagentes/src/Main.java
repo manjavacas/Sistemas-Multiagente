@@ -1,6 +1,6 @@
 import java.io.IOException;
 
-/* Clase principal encargada de lanzar el agente */
+/* Main class */
 
 public class Main {
 
