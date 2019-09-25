@@ -11,7 +11,7 @@ public class Agent {
 	void conectar() throws IOException {
 
 		Document doc = Jsoup.connect("http://en.wikipedia.org/").get();
-
+		System.out.println(doc.title());
 	}
 
 }
