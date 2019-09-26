@@ -6,7 +6,7 @@ public class Main {
 
 	public static void main(String[] args) throws IOException {
 
-		Agent myAgent = new Agent();
+		Agent_Boston myAgent = new Agent_Boston();
 		myAgent.conectar();
 	}
 
