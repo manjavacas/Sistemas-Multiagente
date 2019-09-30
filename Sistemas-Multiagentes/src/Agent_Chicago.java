@@ -1,5 +1,5 @@
 
-/* Agent to get the historical population in Boston */
+/* Agent to get the historical population in Chicago */
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,11 +9,11 @@ import java.util.regex.Pattern;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-public class Agent_Boston {
+public class Agent_Chicago {
 
 	ArrayList<Population_Data> getData() throws IOException {
 
-		Document doc = Jsoup.connect("https://es.wikipedia.org/wiki/Boston").get();
+		Document doc = Jsoup.connect("https://es.wikipedia.org/wiki/Chicago").get();
 
 		// Body and pattern to be found
 		String body = doc.body().text();
