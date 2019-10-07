@@ -23,16 +23,22 @@ public class Agent_Boston {
 		Pattern p = Pattern.compile(myPattern);
 		Matcher m = p.matcher(body);
 
+		// Random number generation from www.random.org
+		int rand = -1;
+		//*** RANDOM GENERATION HERE ***//
+		
+		// Find pattern and store data
 		ArrayList<Population_Data> table = new ArrayList<Population_Data>();
 		Population_Data reg = null;
 
-		// Find pattern and store the data
 		while (m.find()) {
-			String cadena = m.group(0);
-			String populationCad = cadena.substring(5, cadena.length() - 2);
-			reg = new Population_Data(Integer.parseInt(cadena.substring(0, 4)),
-					Integer.parseInt(populationCad.replace(" ", "")));
-			table.add(reg);
+			if (rand % 2 == 0) { // random condition
+				String cadena = m.group(0);
+				String populationCad = cadena.substring(5, cadena.length() - 2);
+				reg = new Population_Data(Integer.parseInt(cadena.substring(0, 4)),
+						Integer.parseInt(populationCad.replace(" ", "")));
+				table.add(reg);
+			}
 		}
 
 		return table;
