@@ -34,7 +34,7 @@ public class Agent_Chicago {
 					Integer.parseInt(populationCad.replace(" ", "")));
 			table.add(reg);
 		}
-
+	
 		return table;
 	}
 
