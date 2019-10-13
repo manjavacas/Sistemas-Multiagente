@@ -37,10 +37,11 @@ public class Agent_Chicago {
 		ArrayList<Population_Data> table = new ArrayList<Population_Data>();
 		Population_Data reg = null;
 
+		// Random number generation from www.random.org
+		RandomOrgClient client = RandomOrgClient.getRandomOrgClient(API_KEY);
+		int rand = client.generateIntegers(1, 0, 10)[0];
+
 		while (m.find()) {
-			// Random number generation from www.random.org
-			RandomOrgClient client = RandomOrgClient.getRandomOrgClient(API_KEY);
-			int rand = client.generateIntegers(1, 0, 10)[0];
 			if (rand % 2 == 0) { // random condition
 				String cadena = m.group(0);
 				String populationCad = cadena.substring(5, cadena.length() - 2);
