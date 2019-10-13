@@ -1,7 +1,18 @@
+package main;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
-/* Main class */
+import agents.Agent_Boston;
+import agents.Agent_Chicago;
+import agents.Agent_Seattle;
+import agents.Population_Data;
+
+/* 
+ * Main class 
+ * External libraries: jsoup-1.12.1, gson-2.8.6, RANDOM.ORG JSON-RPC API v1
+ * Ruben Marquez, Antonio Manjavacas
+ * */
 
 public class Main {
 
