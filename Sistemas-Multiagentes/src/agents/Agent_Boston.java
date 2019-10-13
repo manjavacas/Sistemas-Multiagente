@@ -21,6 +21,10 @@ public class Agent_Boston {
 	final static String REG_EXP = "\\d{4}((\\s\\d{4})|((\\s\\d{1,3}){2,3}))\\s[\\D&&\\W]";
 	final static String API_KEY = "31c9d05e-9079-4778-9db0-7395dbdb9580";
 
+	final static int MAX = 10;
+	final static int MIN = 0;
+	final static int NUMS = 10;
+
 	public ArrayList<Population_Data> getData() throws IOException {
 
 		Document doc = Jsoup.connect(URL).get();
@@ -39,10 +43,11 @@ public class Agent_Boston {
 
 		// Random number generation from www.random.org
 		RandomOrgClient client = RandomOrgClient.getRandomOrgClient(API_KEY);
-		int rand = client.generateIntegers(1, 0, 10)[0];
+		int[] rands = client.generateIntegers(NUMS, MIN, MAX);
+		int n = 0;
 
 		while (m.find()) {
-			if (rand % 2 == 0) { // random condition
+			if (rands[n++ % NUMS] % 2 == 0) { // random condition
 				String cadena = m.group(0);
 				String populationCad = cadena.substring(5, cadena.length() - 2);
 				reg = new Population_Data(Integer.parseInt(cadena.substring(0, 4)),
