@@ -1,10 +1,10 @@
 package agents;
 
-public class Population_Data {
+public class PopulationData {
 
 	private int year, population;
 
-	public Population_Data(int year, int population) {
+	public PopulationData(int year, int population) {
 		this.year = year;
 		this.population = population;
 	}
