@@ -1,4 +1,4 @@
-package agents;
+package model;
 
 public class PopulationData {
 
