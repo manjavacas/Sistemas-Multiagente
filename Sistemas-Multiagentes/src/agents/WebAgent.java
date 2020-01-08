@@ -28,7 +28,9 @@ public class WebAgent extends Agent {
     final static String REG_EXP_URL = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
     final static String API_KEY = "31c9d05e-9079-4778-9db0-7395dbdb9580";
 
+    final static String DASHBOARD = "Dashboard";
     final static String PROCESSER = "Processer";
+    final static String WEB_AGENT = "WebAgent";
 
     final static int MAX = 10;
     final static int MIN = 0;
@@ -36,60 +38,58 @@ public class WebAgent extends Agent {
 
     protected void setup() {
 
-        AID idSender = new AID();
-        idSender.setLocalName(PROCESSER);
-
-        MessageTemplate sender = MessageTemplate.MatchSender(idSender);
+        MessageTemplate sender = MessageTemplate.MatchSender(new AID(PROCESSER, AID.ISLOCALNAME));
         MessageTemplate protocol = MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
         MessageTemplate performative = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
 
         MessageTemplate temp = MessageTemplate.and(sender, protocol);
         temp = MessageTemplate.and(temp, performative);
 
-        addBehaviour(new InfoBehaviour(this, temp));
+        addBehaviour(new RequestReceiver(this, temp));
     }
 
     protected void takeDown() {
-        System.out.println("[WEB AGENT] Taking down...");
+        System.out.println("[WEB-AGENT] Taking down...");
     }
 
-    public class InfoBehaviour extends AchieveREResponder {
+    public class RequestReceiver extends AchieveREResponder {
 
-        public InfoBehaviour(Agent a, MessageTemplate temp) {
+        public RequestReceiver(Agent a, MessageTemplate temp) {
             super(a, temp);
         }
 
         protected ACLMessage handleRequest(ACLMessage request) throws NotUnderstoodException, RefuseException {
-            
+
             String url = request.getContent();
-            
-            if(isValidUrl(url)) {
+
+            if (isValidUrl(url)) {
                 try {
                     ArrayList<PopulationData> data = getData(url);
                 } catch (IOException exception) {
-                    throw new RefuseException("[WEB AGENT] Refuse exception: error getting information.");
+                    throw new RefuseException("[WEB-AGENT] Refuse exception: error getting information.");
                 }
-            } else throw new NotUnderstoodException("[WEB AGENT] NotUnderstoodException: Invalid URL received.");
+            } else
+                throw new NotUnderstoodException("[WEB-AGENT] NotUnderstoodException: Invalid URL received.");
 
             ACLMessage agree = request.createReply();
             agree.setPerformative(ACLMessage.AGREE);
 
-
-            // !! TASKS IN PREPARE RESULT NOTIFICATION METHOD !!
             // TO-DO: serialize ArrayList<PopulationData>
+            // agree.setContentObject(()data);
             // TO-DO: add failure exception
             // TO-DO: prepareResultNotification() method
-            
-            // agree.setContentObject(()data);
 
             return agree;
+        }
+
+        protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) {
+            // TO-DO: tasks here!
         }
 
         /** Checks if and URL is valid **/
         private boolean isValidUrl(String url) {
             Pattern p = Pattern.compile(REG_EXP_URL);
             Matcher m = p.matcher(url);
-
             return m.matches();
         }
 

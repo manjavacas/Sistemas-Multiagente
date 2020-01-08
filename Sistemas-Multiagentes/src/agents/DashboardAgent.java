@@ -15,15 +15,22 @@ import jade.domain.FIPAAGentManagement.FailureException;
 
 public class DashboardAgent extends Agent {
 
+    final static String DASHBOARD = "Dashboard";
+    final static String PROCESSER = "Processer";
+    final static String WEB_AGENT = "WebAgent";
+
     protected void setup() {
 
         // TO-DO: URLs tokenizer
         String msgContent = "";
 
         ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-        msg.addReceiver(new AID("processerID", AID.ISLOCALNAME));
+        msg.addReceiver(new AID(PROCESSER, AID.ISLOCALNAME));
         msg.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+        msg.setSender(new AID(DASHBOARD, AID.ISLOCALNAME));
         msg.setContent(msgContent);
+
+        addBehaviour(new RequestInitiator(this, msg));
     }
 
     protected void takeDown() {
@@ -41,21 +48,22 @@ public class DashboardAgent extends Agent {
         }
 
         protected void handleRefuse(ACLMessage refuse) {
-            System.out.println("[DASHBOARD-AGENT] " + agree.getSender().getName() + " has rejected the request.");
+            System.out.println("[DASHBOARD-AGENT] " + refuse.getSender().getName() + " has rejected the request.");
         }
 
         protected void handleNotUnderstood(ACLMessage notUnderstood) {
-            System.out.println("[DASHBOARD-AGENT] " + agree.getSender().getName() + " didn't understood the request.");
+            System.out.println(
+                    "[DASHBOARD-AGENT] " + notUnderstood.getSender().getName() + " didn't understood the request.");
         }
 
         protected void handleInform(ACLMessage inform) {
-            System.out.println("[DASHBOARD-AGENT] Received results from " + agree.getSender().getName());
+            System.out.println("[DASHBOARD-AGENT] Received results from " + inform.getSender().getName());
             // TO-DO: get results from message
             // TO-DO: implement interface with results
         }
 
         protected void handleFailure(ACLMessage failure) {
-            System.out.println("[DASHBOARD-AGENT] " + agree.getSender().getName() + " has failed!");
+            System.out.println("[DASHBOARD-AGENT] " + failure.getSender().getName() + " has failed!");
         }
 
     }
