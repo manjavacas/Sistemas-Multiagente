@@ -9,9 +9,9 @@ import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREResponder;
 
 import jade.domain.FIPANames;
-import jade.domain.FIPAAGentManagement.NotUnderstoodException;
-import jade.domain.FIPAAGentManagement.RefuseException;
-import jade.domain.FIPAAGentManagement.FailureException;
+import jade.domain.FIPAAgentManagement.NotUnderstoodException;
+import jade.domain.FIPAAgentManagement.RefuseException;
+import jade.domain.FIPAAgentManagement.FailureException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class WebAgent extends Agent {
 
     final static String DASHBOARD = "Dashboard";
     final static String PROCESSER = "Processer";
-    final static String WEB_AGENT = "WebAgent";
+
 
     final static int MAX = 10;
     final static int MIN = 0;
@@ -53,7 +53,8 @@ public class WebAgent extends Agent {
     }
 
     public class RequestReceiver extends AchieveREResponder {
-
+    	ArrayList<PopulationData> data;
+    	
         public RequestReceiver(Agent a, MessageTemplate temp) {
             super(a, temp);
         }
@@ -64,7 +65,7 @@ public class WebAgent extends Agent {
 
             if (isValidUrl(url)) {
                 try {
-                    ArrayList<PopulationData> data = getData(url);
+                    data = getData(url);
                 } catch (IOException exception) {
                     throw new RefuseException("[WEB-AGENT] Refuse exception: error getting information.");
                 }
@@ -74,16 +75,21 @@ public class WebAgent extends Agent {
             ACLMessage agree = request.createReply();
             agree.setPerformative(ACLMessage.AGREE);
 
-            // TO-DO: serialize ArrayList<PopulationData>
-            // agree.setContentObject(()data);
-            // TO-DO: add failure exception
-            // TO-DO: prepareResultNotification() method
-
             return agree;
         }
 
-        protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) {
+        protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) throws FailureException {
             // TO-DO: tasks here!
+        	System.out.println("[" + this.myAgent.getLocalName() + "] " + "Preparing the result.");
+        	ACLMessage inform = request.createReply();
+            inform.setPerformative(ACLMessage.INFORM);
+            try {
+				inform.setContentObject(data);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				throw new FailureException("[WEB-AGENT] FailureException: serialization error.");
+			}
+            return inform;
         }
 
         /** Checks if and URL is valid **/
@@ -94,7 +100,7 @@ public class WebAgent extends Agent {
         }
 
         /** Get population and date registers **/
-        private ArrayList<Population_Data> getData(String url) throws IOException {
+        private ArrayList<PopulationData> getData(String url) throws IOException {
 
             Document doc = Jsoup.connect(url).get();
 
@@ -107,8 +113,8 @@ public class WebAgent extends Agent {
             Matcher m = p.matcher(body);
 
             // Find pattern and store data
-            ArrayList<Population_Data> table = new ArrayList<Population_Data>();
-            Population_Data reg = null;
+            ArrayList<PopulationData> table = new ArrayList<PopulationData>();
+            PopulationData reg = null;
 
             // Random number generation from www.random.org
             RandomOrgClient client = RandomOrgClient.getRandomOrgClient(API_KEY);
@@ -119,7 +125,7 @@ public class WebAgent extends Agent {
                 if (rands[n++ % NUMS] % 2 == 0) { // random condition
                     String cadena = m.group(0);
                     String populationCad = cadena.substring(5, cadena.length() - 2);
-                    reg = new Population_Data(Integer.parseInt(cadena.substring(0, 4)),
+                    reg = new PopulationData(Integer.parseInt(cadena.substring(0, 4)),
                             Integer.parseInt(populationCad.replace(" ", "")));
                     table.add(reg);
                 }

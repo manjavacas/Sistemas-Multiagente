@@ -1,6 +1,8 @@
 package model;
 
-public class PopulationData {
+import java.io.Serializable;
+
+public class PopulationData implements Serializable {
 
 	private int year, population;
 
