@@ -31,7 +31,6 @@ public class WebAgent extends Agent {
     final static String DASHBOARD = "Dashboard";
     final static String PROCESSER = "Processer";
 
-
     final static int MAX = 10;
     final static int MIN = 0;
     final static int NUMS = 10;
@@ -41,7 +40,6 @@ public class WebAgent extends Agent {
         MessageTemplate sender = MessageTemplate.MatchSender(new AID(PROCESSER, AID.ISLOCALNAME));
         MessageTemplate protocol = MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
         MessageTemplate performative = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
-
         MessageTemplate temp = MessageTemplate.and(sender, protocol);
         temp = MessageTemplate.and(temp, performative);
 
@@ -53,8 +51,9 @@ public class WebAgent extends Agent {
     }
 
     public class RequestReceiver extends AchieveREResponder {
-    	ArrayList<PopulationData> data;
-    	
+
+        ArrayList<PopulationData> data;
+
         public RequestReceiver(Agent a, MessageTemplate temp) {
             super(a, temp);
         }
@@ -67,7 +66,7 @@ public class WebAgent extends Agent {
                 try {
                     data = getData(url);
                 } catch (IOException exception) {
-                    throw new RefuseException("[WEB-AGENT] Refuse exception: error getting information.");
+                    throw new RefuseException("[WEB-AGENT] Refuse exception: error getting information from URL.");
                 }
             } else
                 throw new NotUnderstoodException("[WEB-AGENT] NotUnderstoodException: Invalid URL received.");
@@ -78,17 +77,19 @@ public class WebAgent extends Agent {
             return agree;
         }
 
-        protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) throws FailureException {
-            // TO-DO: tasks here!
-        	System.out.println("[" + this.myAgent.getLocalName() + "] " + "Preparing the result.");
-        	ACLMessage inform = request.createReply();
+        protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
+                throws FailureException {
+
+            System.out.println("[WEB-AGENT]" + "Preparing result...");
+            ACLMessage inform = request.createReply();
             inform.setPerformative(ACLMessage.INFORM);
+
             try {
-				inform.setContentObject(data);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				throw new FailureException("[WEB-AGENT] FailureException: serialization error.");
-			}
+                inform.setContentObject(data);
+            } catch (IOException e) {
+                throw new FailureException("[WEB-AGENT] FailureException: serialization error.");
+            }
+
             return inform;
         }
 

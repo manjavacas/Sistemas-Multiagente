@@ -32,14 +32,11 @@ public class ProcesserAgent extends Agent {
         MessageTemplate protocol = MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
         MessageTemplate performative = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
         MessageTemplate sender = MessageTemplate.MatchSender(new AID(DASHBOARD, AID.ISLOCALNAME));
-
         MessageTemplate temp = MessageTemplate.and(protocol, performative);
         temp = MessageTemplate.and(temp, sender);
-        
+
         requestReceiver = new RequestReceiver(this, temp);
-
         addBehaviour(requestReceiver);
-
     }
 
     protected void takeDown() {
@@ -53,63 +50,73 @@ public class ProcesserAgent extends Agent {
         }
 
         protected ACLMessage handleRequest(ACLMessage request) throws NotUnderstoodException, RefuseException {
-        	System.out.println("[PROCESSER-AGENT] " + request.getSender().getName() + " has sent a request.");
-        	ArrayList<String> msgContent = null;
-			try {
-				msgContent = (ArrayList<String>)request.getContentObject();
-			} catch (UnreadableException e) {
-				// TODO Auto-generated catch block
-				throw new NotUnderstoodException("Unreadable content of the message.");
-			}
-        	
-			if (msgContent.size() == 3) {
-				ParallelBehaviour pb = new ParallelBehaviour(0);
-				String webAgentName, webAgentUrl;
-				
-				for (String content : msgContent) {
-					String[] contentParts = content.split(":");
-					webAgentName = contentParts[0];
-					webAgentUrl = contentParts[1];
-					
-					ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-					msg.addReceiver(new AID((String) webAgentName, AID.ISLOCALNAME));
-					msg.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
-					msg.setSender(new AID(PROCESSER, AID.ISLOCALNAME));
-		            msg.setContent(webAgentUrl);
-		            
-		            pb.addSubBehaviour(new RequestInitiator(myAgent, msg));
-				}
-				
-				addBehaviour(pb);
-			} else {
-				throw new RefuseException("The content message contains information for " + msgContent.size() + " web agents.\nThere are 3 web agents.");
-			}
-			
-			this.block();
-			
-        	ACLMessage agree = request.createReply();
+
+            System.out.println("[PROCESSER-AGENT] " + request.getSender().getName() + " has sent a request.");
+            ArrayList<String> msgContent = null;
+
+            try {
+                msgContent = (ArrayList<String>) request.getContentObject();
+            } catch (UnreadableException e) {
+                throw new NotUnderstoodException("[PROCESSER-AGENT] Unreadable content of the message.");
+            }
+
+            if (msgContent.size() == 3) {
+
+                ParallelBehaviour pb = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
+                String webAgentName, webAgentUrl;
+
+                for (String content : msgContent) {
+                    
+                    String[] contentParts = content.split(":");
+                    webAgentName = contentParts[0];
+                    webAgentUrl = contentParts[1];
+
+                    System.out.println("[PROCESSER-AGENT] URL: " + webAgentUrl + " will be processed by: " + webAgentName);
+
+                    ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+                    msg.addReceiver(new AID((String) webAgentName, AID.ISLOCALNAME));
+                    msg.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+                    msg.setSender(new AID(PROCESSER, AID.ISLOCALNAME));
+                    msg.setContent(webAgentUrl);
+
+                    pb.addSubBehaviour(new RequestInitiator(this, msg));
+                }
+
+                addBehaviour(pb);
+
+            } else {
+                throw new RefuseException("[PROCESSER-AGENT] The message content contains information for "
+                        + msgContent.size() + " web agents but 3 web agents are needed!");
+            }
+
+            this.block();
+
+            ACLMessage agree = request.createReply();
             agree.setPerformative(ACLMessage.AGREE);
             return agree;
         }
 
         protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
                 throws FailureException {
-        	System.out.println("[PROCESSER-AGENT] " + "Preparing the result.");
-        	ACLMessage inform = request.createReply();
+
+            System.out.println("[PROCESSER-AGENT] Preparing result...");
+            ACLMessage inform = request.createReply();
             inform.setPerformative(ACLMessage.INFORM);
+
             try {
-				inform.setContentObject(info);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				throw new FailureException("[PROCESSER-AGENT] FailureException: serialization error.");
-			}
+                inform.setContentObject(info);
+            } catch (IOException e) {
+                throw new FailureException("[PROCESSER-AGENT] FailureException: serialization error.");
+            }
+
             return inform;
         }
 
     }
 
     public class RequestInitiator extends AchieveREInitiator {
-    	private int cont = 0;
+
+        private int count = 0;
 
         public RequestInitiator(Agent a, ACLMessage msg) {
             super(a, msg);
@@ -129,22 +136,22 @@ public class ProcesserAgent extends Agent {
         }
 
         protected void handleInform(ACLMessage inform) {
-        	cont++;
+
+            count++;
             System.out.println("[PROCESSER] Received results from " + inform.getSender().getName());
 
             ArrayList<PopulationData> table = null;
-			try {
-				table = (ArrayList<PopulationData>)inform.getContentObject();
-			} catch (UnreadableException e) {
-				// TODO Auto-generated catch block
-				System.out.println(e.getMessage());
-			}
-			
-			info.add(table);
-			
-			if (cont >= 3) {
-				requestReceiver.restart();
-			}
+            try {
+                table = (ArrayList<PopulationData>) inform.getContentObject();
+            } catch (UnreadableException e) {
+                System.out.println(e.getMessage());
+            }
+
+            info.add(table);
+
+            if (count >= 3) {
+                requestReceiver.restart();
+            }
         }
 
         protected void handleFailure(ACLMessage failure) {
