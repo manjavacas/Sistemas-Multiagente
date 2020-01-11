@@ -1,6 +1,6 @@
 package agents;
 
-// Agent
+// Agent imports
 import jade.core.Agent;
 
 import java.io.IOException;
@@ -13,7 +13,7 @@ import jade.proto.AchieveREInitiator;
 import model.PopulationData;
 import jade.domain.FIPANames;
 
-// Interface
+// Interface imports
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
