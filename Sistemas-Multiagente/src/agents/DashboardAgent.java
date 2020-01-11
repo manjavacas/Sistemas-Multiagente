@@ -1,16 +1,15 @@
 package agents;
 
-// Agent imports
-import jade.core.Agent;
-
 import java.io.IOException;
 import java.util.ArrayList;
+
+// Agent imports
+import jade.core.Agent;
 
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import jade.proto.AchieveREInitiator;
-import model.PopulationData;
 import jade.domain.FIPANames;
 
 // Interface imports
@@ -41,21 +40,26 @@ public class DashboardAgent extends Agent {
 	final static String WEB_AGENT_2 = "WebAgent2";
 	final static String WEB_AGENT_3 = "WebAgent3";
 
-	protected void setup() {;
+	protected void setup() {
+
+		Form frame = null;
 
 		try {
-			Form frame = new Form();
+			frame = new Form();
 			frame.setVisible(true);
 		} catch (Exception e) {
 			System.out.println("[DASHBOARD-AGENT] Form view failed: " + e.getMessage());
 		}
 
-		while(!Form.READY);
+		while (!frame.ready) { // wait until button event
+		}
+
+		System.out.println("[DASHBOARD-AGENT] Received URLs! Sending to processer...");
 
 		ArrayList<String> msgContent = new ArrayList<String>();
-		msgContent.add(WEB_AGENT_1 + ":" + Form.URL_1);
-		msgContent.add(WEB_AGENT_2 + ":" + Form.URL_2);
-		msgContent.add(WEB_AGENT_3 + ":" + Form.URL_3);
+		msgContent.add(WEB_AGENT_1 + ":" + frame.url_1);
+		msgContent.add(WEB_AGENT_2 + ":" + frame.url_2);
+		msgContent.add(WEB_AGENT_3 + ":" + frame.url_3);
 
 		ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
 		msg.addReceiver(new AID(PROCESSER, AID.ISLOCALNAME));
@@ -128,11 +132,15 @@ public class DashboardAgent extends Agent {
 		private JTextField textField2;
 		private JTextField textField3;
 
-		public static String URL_1 = "";
-		public static String URL_2 = "";
-		public static String URL_3 = "";
+		public String url_1 = "";
+		public String url_2 = "";
+		public String url_3 = "";
 
-		public static boolean READY = false;
+		private String default_url_1 = "https://es.wikipedia.org/wiki/Boston";
+		private String default_url_2 = "https://es.wikipedia.org/wiki/Chicago";
+		private String default_url_3 = "https://es.wikipedia.org/wiki/Seattle";
+
+		public boolean ready = false;
 
 		/**
 		 * Create the frame
@@ -172,7 +180,7 @@ public class DashboardAgent extends Agent {
 			gbc_lblUrl1.gridy = 2;
 			panel.add(lblUrl1, gbc_lblUrl1);
 
-			textField1 = new JTextField();
+			textField1 = new JTextField(default_url_1);
 			GridBagConstraints gbc_textField1 = new GridBagConstraints();
 			gbc_textField1.fill = GridBagConstraints.HORIZONTAL;
 			gbc_textField1.insets = new Insets(0, 0, 5, 5);
@@ -188,7 +196,7 @@ public class DashboardAgent extends Agent {
 			gbc_lblUrl2.gridy = 3;
 			panel.add(lblUrl2, gbc_lblUrl2);
 
-			textField2 = new JTextField();
+			textField2 = new JTextField(default_url_2);
 			GridBagConstraints gbc_textField2 = new GridBagConstraints();
 			gbc_textField2.fill = GridBagConstraints.HORIZONTAL;
 			gbc_textField2.insets = new Insets(0, 0, 5, 5);
@@ -204,7 +212,7 @@ public class DashboardAgent extends Agent {
 			gbc_lblUrl3.gridy = 4;
 			panel.add(lblUrl3, gbc_lblUrl3);
 
-			textField3 = new JTextField();
+			textField3 = new JTextField(default_url_3);
 			GridBagConstraints gbc_textField3 = new GridBagConstraints();
 			gbc_textField3.insets = new Insets(0, 0, 5, 5);
 			gbc_textField3.fill = GridBagConstraints.HORIZONTAL;
@@ -216,9 +224,9 @@ public class DashboardAgent extends Agent {
 			JButton btnProcess = new JButton("Process");
 			btnProcess.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
-					URL_1 = textField1.getText();
-					URL_2 = textField2.getText();
-					URL_3 = textField3.getText();
+					url_1 = textField1.getText();
+					url_2 = textField2.getText();
+					url_3 = textField3.getText();
 					ready = true;
 					dispose();
 				}

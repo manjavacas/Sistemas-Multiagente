@@ -1,7 +1,5 @@
 package agents;
 
-import agents.PopulationData;
-
 import jade.core.Agent;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
