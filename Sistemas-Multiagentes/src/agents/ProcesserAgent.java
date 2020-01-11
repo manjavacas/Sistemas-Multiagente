@@ -1,6 +1,6 @@
 package agents;
 
-import model.PopulationData;
+import agents.PopulationData;
 
 import jade.core.Agent;
 import jade.core.behaviours.ParallelBehaviour;
@@ -24,6 +24,9 @@ public class ProcesserAgent extends Agent {
 
     final static String DASHBOARD = "Dashboard";
     final static String PROCESSER = "Processer";
+
+    final static int N_WEB_AGENTS = 3;
+
     private ArrayList<ArrayList<PopulationData>> info = new ArrayList<ArrayList<PopulationData>>();
     private RequestReceiver requestReceiver;
 
@@ -60,18 +63,19 @@ public class ProcesserAgent extends Agent {
                 throw new NotUnderstoodException("[PROCESSER-AGENT] Unreadable content of the message.");
             }
 
-            if (msgContent.size() == 3) {
+            if (msgContent.size() == N_WEB_AGENTS) {
 
                 ParallelBehaviour pb = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
                 String webAgentName, webAgentUrl;
 
                 for (String content : msgContent) {
-                    
+
                     String[] contentParts = content.split(":");
                     webAgentName = contentParts[0];
                     webAgentUrl = contentParts[1];
 
-                    System.out.println("[PROCESSER-AGENT] URL: " + webAgentUrl + " will be processed by: " + webAgentName);
+                    System.out.println(
+                            "[PROCESSER-AGENT] URL: " + webAgentUrl + " will be processed by: " + webAgentName);
 
                     ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
                     msg.addReceiver(new AID((String) webAgentName, AID.ISLOCALNAME));
@@ -86,7 +90,7 @@ public class ProcesserAgent extends Agent {
 
             } else {
                 throw new RefuseException("[PROCESSER-AGENT] The message content contains information for "
-                        + msgContent.size() + " web agents but 3 web agents are needed!");
+                        + msgContent.size() + " web agents but " + N_WEB_AGENTS + " web agents are needed!");
             }
 
             this.block();
@@ -149,7 +153,7 @@ public class ProcesserAgent extends Agent {
 
             info.add(table);
 
-            if (count >= 3) {
+            if (count >= N_WEB_AGENTS) {
                 requestReceiver.restart();
             }
         }

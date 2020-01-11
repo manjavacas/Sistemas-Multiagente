@@ -1,6 +1,6 @@
 package agents;
 
-import model.PopulationData;
+import agents.PopulationData;
 
 import jade.core.Agent;
 import jade.core.AID;

@@ -1,4 +1,4 @@
-package model;
+package agents;
 
 import java.io.Serializable;
 
