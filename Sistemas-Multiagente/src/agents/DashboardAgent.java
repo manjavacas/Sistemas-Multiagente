@@ -100,29 +100,34 @@ public class DashboardAgent extends Agent {
 
 		protected void handleNotUnderstood(ACLMessage notUnderstood) {
 			System.out.println(
-					"[DASHBOARD-AGENT] " + notUnderstood.getSender().getName() + " didn't understood the request.");
-		}
+
+			
 
 		protected void handleInform(ACLMessage inform) {
 			System.out.println("[DASHBOARD-AGENT] Received results from " + inform.getSender().getName());
 
-			ArrayList<ArrayList<PopulationData>> info = null;
+			ArrayList<PopulationData> info = null;
 
 			try {
-				info = (ArrayList<ArrayList<PopulationData>>) inform.getContentObject();
+				info = (ArrayList<PopulationData>) inform.getContentObject();
 			} catch (UnreadableException e) {
-				System.out.println("[DASHBOARD-AGENT] " + e.getMessage());
-			}
-			
+				Syst
+
+				
 			System.out.println("[DASHBOARD-AGENT] Showing results...");
-			
-			for (ArrayList<PopulationData> table : info) {
-				for (PopulationData line : table) {
-					System.out.println(line);
-				}
+
+			Summary sum = null;
+
+			try {
+				sum = new Summary();
+				sum.textPane.setText(info.get(0));
+				sum.textPane_1.setText(info.get(1));
+				sum.textPane_2.setText(info.get(2));
+				sum.setVisible(true);
+			} catch (Exception e) {
+				System.out.println("[DASHBOARD-AGENT] Summary view failed: " + e.getMessage());
 			}
 
-			// TO-DO: Implement interface with results
 		}
 
 		protected void handleFailure(ACLMessage failure) {
@@ -247,6 +252,90 @@ public class DashboardAgent extends Agent {
 			gbc_btnProcess.gridx = 3;
 			gbc_btnProcess.gridy = 5;
 			panel.add(btnProcess, gbc_btnProcess);
+		}
+
+		/* Output information form */
+		class Summary extends JFrame {
+
+			private static final long serialVersionUID = 1L;
+			private JPanel contentPane;
+
+			public JTextPane textPane;
+			public JTextPane textPane_1;
+			public JTextPane textPane_2;
+
+			/**
+			 * Create the frame.
+			 */
+			public Summary() {
+				setTitle("Summary");
+				setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				setBounds(100, 100, 783, 528);
+				contentPane = new JPanel();
+				contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+				setContentPane(contentPane);
+				GridBagLayout gbl_contentPane = new GridBagLayout();
+				gbl_contentPane.columnWidths = new int[] { 0, 0, 0, 0, 0 };
+				gbl_contentPane.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+				gbl_contentPane.columnWeights = new double[] { 1.0, 0.0, 1.0, 1.0, Double.MIN_VALUE };
+				gbl_contentPane.rowWeights = new double[] { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE };
+				contentPane.setLayout(gbl_contentPane);
+
+				JLabel lblTitle = new JLabel("Most populated years obtained...");
+				lblTitle.setFont(new Font("Tahoma", Font.BOLD, 15));
+				GridBagConstraints gbc_lblTitle = new GridBagConstraints();
+				gbc_lblTitle.gridwidth = 2;
+				gbc_lblTitle.insets = new Insets(0, 0, 5, 5);
+				gbc_lblTitle.gridx = 1;
+				gbc_lblTitle.gridy = 1;
+				contentPane.add(lblTitle, gbc_lblTitle);
+
+				JLabel lblResult1 = new JLabel("Result 1:");
+				GridBagConstraints gbc_lblResult1 = new GridBagConstraints();
+				gbc_lblResult1.insets = new Insets(0, 0, 5, 5);
+				gbc_lblResult1.gridx = 1;
+				gbc_lblResult1.gridy = 2;
+				contentPane.add(lblResult1, gbc_lblResult1);
+
+				textPane = new JTextPane();
+				GridBagConstraints gbc_textPane = new GridBagConstraints();
+				gbc_textPane.insets = new Insets(0, 0, 5, 5);
+				gbc_textPane.fill = GridBagConstraints.HORIZONTAL;
+				gbc_textPane.gridx = 2;
+				gbc_textPane.gridy = 2;
+				contentPane.add(textPane, gbc_textPane);
+
+				JLabel lblResult2 = new JLabel("Result 2:");
+				GridBagConstraints gbc_lblResult2 = new GridBagConstraints();
+				gbc_lblResult2.insets = new Insets(0, 0, 5, 5);
+				gbc_lblResult2.gridx = 1;
+				gbc_lblResult2.gridy = 3;
+				contentPane.add(lblResult2, gbc_lblResult2);
+
+				textPane_1 = new JTextPane();
+				GridBagConstraints gbc_textPane_1 = new GridBagConstraints();
+				gbc_textPane_1.insets = new Insets(0, 0, 5, 5);
+				gbc_textPane_1.fill = GridBagConstraints.HORIZONTAL;
+				gbc_textPane_1.gridx = 2;
+				gbc_textPane_1.gridy = 3;
+				contentPane.add(textPane_1, gbc_textPane_1);
+
+				JLabel lblResult3 = new JLabel("Result 3:");
+				GridBagConstraints gbc_lblResult3 = new GridBagConstraints();
+				gbc_lblResult3.insets = new Insets(0, 0, 5, 5);
+				gbc_lblResult3.gridx = 1;
+				gbc_lblResult3.gridy = 4;
+				contentPane.add(lblResult3, gbc_lblResult3);
+
+				textPane_2 = new JTextPane();
+				GridBagConstraints gbc_textPane_2 = new GridBagConstraints();
+				gbc_textPane_2.insets = new Insets(0, 0, 5, 5);
+				gbc_textPane_2.fill = GridBagConstraints.HORIZONTAL;
+				gbc_textPane_2.gridx = 2;
+				gbc_textPane_2.gridy = 4;
+				contentPane.add(textPane_2, gbc_textPane_2);
+			}
+
 		}
 
 	}

@@ -26,8 +26,8 @@ public class ProcesserAgent extends Agent {
 
 	final static int N_WEB_AGENTS = 3;
 
-	private static ArrayList<ArrayList<PopulationData>> info = new ArrayList<ArrayList<PopulationData>>();
 	private static RequestReceiver requestReceiver;
+	private static ArrayList<PopulationData> maxPopulationsList = new ArrayList<PopulationData>();
 
 	protected void setup() {
 
@@ -107,7 +107,7 @@ public class ProcesserAgent extends Agent {
 			inform.setPerformative(ACLMessage.INFORM);
 
 			try {
-				inform.setContentObject(info);
+				inform.setContentObject(maxPopulationsList);
 			} catch (IOException e) {
 				throw new FailureException("[PROCESSER-AGENT] FailureException: serialization error.");
 			}
@@ -145,15 +145,24 @@ public class ProcesserAgent extends Agent {
 			System.out.println("[PROCESSER-AGENT] Received results from " + inform.getSender().getName());
 
 			ArrayList<PopulationData> table = null;
+			
 			try {
 				table = (ArrayList<PopulationData>) inform.getContentObject();
 			} catch (UnreadableException e) {
 				System.out.println(e.getMessage());
 			}
 
-			info.add(table);
+			// Data processing: get greatest population
+			PopulationData greatest = null;
+			for(PopulationData pd : table) {
+				if(pd.getPopulation() > greatest.getPopulation()) {
+					greatest = pd;
+				}
+			}
+
+			maxPopulationsList.add(greatest);
 			
-			if (count >= 3) {
+			if (count >= N_WEB_AGENTS) {
 				AchieveREResponder resp = (AchieveREResponder) requestReceiver;
 				String incomingRequestkey = (String) resp.REQUEST_KEY;
 				ACLMessage incomingRequest = (ACLMessage) resp.getDataStore().get(incomingRequestkey);
@@ -161,7 +170,7 @@ public class ProcesserAgent extends Agent {
 				ACLMessage notification = incomingRequest.createReply();
 				notification.setPerformative(ACLMessage.INFORM);
 				try {
-					notification.setContentObject(info);
+					notification.setContentObject(maxPopulationsList);
 				} catch (IOException e) {
 					System.out.println(e.getMessage());
 				}
