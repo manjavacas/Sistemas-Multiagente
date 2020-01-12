@@ -100,10 +100,11 @@ public class DashboardAgent extends Agent {
 
 		protected void handleNotUnderstood(ACLMessage notUnderstood) {
 			System.out.println(
-
-			
+					"[DASHBOARD-AGENT] " + notUnderstood.getSender().getName() + " didn't understood the request.");
+		}
 
 		protected void handleInform(ACLMessage inform) {
+
 			System.out.println("[DASHBOARD-AGENT] Received results from " + inform.getSender().getName());
 
 			ArrayList<PopulationData> info = null;
@@ -111,10 +112,8 @@ public class DashboardAgent extends Agent {
 			try {
 				info = (ArrayList<PopulationData>) inform.getContentObject();
 			} catch (UnreadableException e) {
-				Syst
-
-				
-			System.out.println("[DASHBOARD-AGENT] Showing results...");
+				System.out.println("[DASHBOARD-AGENT] " + e.getMessage());
+			}
 
 			Summary sum = null;
 
