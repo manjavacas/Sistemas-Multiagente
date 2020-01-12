@@ -62,11 +62,11 @@ public class ProcesserAgent extends Agent {
 			} catch (UnreadableException e) {
 				throw new NotUnderstoodException("[PROCESSER-AGENT] Unreadable content of the message.");
 			}
-			
+
 			ParallelBehaviour se = new ParallelBehaviour();
 
 			if (msgContent.size() == N_WEB_AGENTS) {
-				
+
 				String webAgentName, webAgentUrl;
 
 				for (String content : msgContent) {
@@ -139,13 +139,13 @@ public class ProcesserAgent extends Agent {
 		}
 
 		protected void handleInform(ACLMessage inform) {
-			
+
 			count++;
 
 			System.out.println("[PROCESSER-AGENT] Received results from " + inform.getSender().getName());
 
 			ArrayList<PopulationData> table = null;
-			
+
 			try {
 				table = (ArrayList<PopulationData>) inform.getContentObject();
 			} catch (UnreadableException e) {
@@ -154,19 +154,23 @@ public class ProcesserAgent extends Agent {
 
 			// Data processing: get greatest population
 			PopulationData greatest = null;
-			for(PopulationData pd : table) {
-				if(pd.getPopulation() > greatest.getPopulation()) {
+			for (PopulationData pd : table) {
+				if (greatest == null) {
+					greatest = pd;
+				}
+				if (pd.getPopulation() > greatest.getPopulation()) {
 					greatest = pd;
 				}
 			}
 
 			maxPopulationsList.add(greatest);
-			
+
 			if (count >= N_WEB_AGENTS) {
 				AchieveREResponder resp = (AchieveREResponder) requestReceiver;
 				String incomingRequestkey = (String) resp.REQUEST_KEY;
 				ACLMessage incomingRequest = (ACLMessage) resp.getDataStore().get(incomingRequestkey);
-				// Prepare the notification to the request originator and store it in the DataStore
+				// Prepare the notification to the request originator and store it in the
+				// DataStore
 				ACLMessage notification = incomingRequest.createReply();
 				notification.setPerformative(ACLMessage.INFORM);
 				try {

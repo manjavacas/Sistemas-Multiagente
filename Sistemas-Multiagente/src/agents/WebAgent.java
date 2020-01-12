@@ -125,7 +125,7 @@ public class WebAgent extends Agent {
                     String cadena = m.group(0);
                     String populationCad = cadena.substring(5, cadena.length() - 2);
                     reg = new PopulationData(Integer.parseInt(cadena.substring(0, 4)),
-                            Integer.parseInt(populationCad.replace(" ", "")));
+                            Integer.parseInt(populationCad.replace(" ", "")), url);
                     table.add(reg);
                 }
             }

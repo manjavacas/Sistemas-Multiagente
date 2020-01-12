@@ -5,10 +5,12 @@ import java.io.Serializable;
 public class PopulationData implements Serializable {
 
 	private int year, population;
+	private String url;
 
-	public PopulationData(int year, int population) {
+	public PopulationData(int year, int population, String url) {
 		this.year = year;
 		this.population = population;
+		this.url = url;
 	}
 
 	public int getYear() {
@@ -27,9 +29,17 @@ public class PopulationData implements Serializable {
 		this.population = population;
 	}
 
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
 	@Override
 	public String toString() {
-		return "[Year: " + year + " ----- " + population + "]";
+		return "YEAR: " + year + ", POPULATION: " + population + ", URL: " + url;
 	}
 
 }

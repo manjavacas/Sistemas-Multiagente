@@ -21,6 +21,8 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import java.awt.GridBagLayout;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
+
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.JLabel;
@@ -119,9 +121,9 @@ public class DashboardAgent extends Agent {
 
 			try {
 				sum = new Summary();
-				sum.textPane.setText(info.get(0));
-				sum.textPane_1.setText(info.get(1));
-				sum.textPane_2.setText(info.get(2));
+				sum.textPane.setText(info.get(0).toString());
+				sum.textPane_1.setText(info.get(1).toString());
+				sum.textPane_2.setText(info.get(2).toString());
 				sum.setVisible(true);
 			} catch (Exception e) {
 				System.out.println("[DASHBOARD-AGENT] Summary view failed: " + e.getMessage());
@@ -253,88 +255,88 @@ public class DashboardAgent extends Agent {
 			panel.add(btnProcess, gbc_btnProcess);
 		}
 
-		/* Output information form */
-		class Summary extends JFrame {
+	}
+	
+	/* Output information form */
+	class Summary extends JFrame {
 
-			private static final long serialVersionUID = 1L;
-			private JPanel contentPane;
+		private static final long serialVersionUID = 1L;
+		private JPanel contentPane;
 
-			public JTextPane textPane;
-			public JTextPane textPane_1;
-			public JTextPane textPane_2;
+		public JTextPane textPane;
+		public JTextPane textPane_1;
+		public JTextPane textPane_2;
 
-			/**
-			 * Create the frame.
-			 */
-			public Summary() {
-				setTitle("Summary");
-				setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				setBounds(100, 100, 783, 528);
-				contentPane = new JPanel();
-				contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-				setContentPane(contentPane);
-				GridBagLayout gbl_contentPane = new GridBagLayout();
-				gbl_contentPane.columnWidths = new int[] { 0, 0, 0, 0, 0 };
-				gbl_contentPane.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
-				gbl_contentPane.columnWeights = new double[] { 1.0, 0.0, 1.0, 1.0, Double.MIN_VALUE };
-				gbl_contentPane.rowWeights = new double[] { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE };
-				contentPane.setLayout(gbl_contentPane);
+		/**
+		 * Create the frame.
+		 */
+		public Summary() {
+			setTitle("Summary");
+			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			setBounds(100, 100, 783, 528);
+			contentPane = new JPanel();
+			contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+			setContentPane(contentPane);
+			GridBagLayout gbl_contentPane = new GridBagLayout();
+			gbl_contentPane.columnWidths = new int[] { 0, 0, 0, 0, 0 };
+			gbl_contentPane.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+			gbl_contentPane.columnWeights = new double[] { 1.0, 0.0, 1.0, 1.0, Double.MIN_VALUE };
+			gbl_contentPane.rowWeights = new double[] { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, Double.MIN_VALUE };
+			contentPane.setLayout(gbl_contentPane);
 
-				JLabel lblTitle = new JLabel("Most populated years obtained...");
-				lblTitle.setFont(new Font("Tahoma", Font.BOLD, 15));
-				GridBagConstraints gbc_lblTitle = new GridBagConstraints();
-				gbc_lblTitle.gridwidth = 2;
-				gbc_lblTitle.insets = new Insets(0, 0, 5, 5);
-				gbc_lblTitle.gridx = 1;
-				gbc_lblTitle.gridy = 1;
-				contentPane.add(lblTitle, gbc_lblTitle);
+			JLabel lblTitle = new JLabel("Most populated years obtained...");
+			lblTitle.setFont(new Font("Tahoma", Font.BOLD, 15));
+			GridBagConstraints gbc_lblTitle = new GridBagConstraints();
+			gbc_lblTitle.gridwidth = 2;
+			gbc_lblTitle.insets = new Insets(0, 0, 5, 5);
+			gbc_lblTitle.gridx = 1;
+			gbc_lblTitle.gridy = 1;
+			contentPane.add(lblTitle, gbc_lblTitle);
 
-				JLabel lblResult1 = new JLabel("Result 1:");
-				GridBagConstraints gbc_lblResult1 = new GridBagConstraints();
-				gbc_lblResult1.insets = new Insets(0, 0, 5, 5);
-				gbc_lblResult1.gridx = 1;
-				gbc_lblResult1.gridy = 2;
-				contentPane.add(lblResult1, gbc_lblResult1);
+			JLabel lblResult1 = new JLabel("Result 1:");
+			GridBagConstraints gbc_lblResult1 = new GridBagConstraints();
+			gbc_lblResult1.insets = new Insets(0, 0, 5, 5);
+			gbc_lblResult1.gridx = 1;
+			gbc_lblResult1.gridy = 2;
+			contentPane.add(lblResult1, gbc_lblResult1);
 
-				textPane = new JTextPane();
-				GridBagConstraints gbc_textPane = new GridBagConstraints();
-				gbc_textPane.insets = new Insets(0, 0, 5, 5);
-				gbc_textPane.fill = GridBagConstraints.HORIZONTAL;
-				gbc_textPane.gridx = 2;
-				gbc_textPane.gridy = 2;
-				contentPane.add(textPane, gbc_textPane);
+			textPane = new JTextPane();
+			GridBagConstraints gbc_textPane = new GridBagConstraints();
+			gbc_textPane.insets = new Insets(0, 0, 5, 5);
+			gbc_textPane.fill = GridBagConstraints.HORIZONTAL;
+			gbc_textPane.gridx = 2;
+			gbc_textPane.gridy = 2;
+			contentPane.add(textPane, gbc_textPane);
 
-				JLabel lblResult2 = new JLabel("Result 2:");
-				GridBagConstraints gbc_lblResult2 = new GridBagConstraints();
-				gbc_lblResult2.insets = new Insets(0, 0, 5, 5);
-				gbc_lblResult2.gridx = 1;
-				gbc_lblResult2.gridy = 3;
-				contentPane.add(lblResult2, gbc_lblResult2);
+			JLabel lblResult2 = new JLabel("Result 2:");
+			GridBagConstraints gbc_lblResult2 = new GridBagConstraints();
+			gbc_lblResult2.insets = new Insets(0, 0, 5, 5);
+			gbc_lblResult2.gridx = 1;
+			gbc_lblResult2.gridy = 3;
+			contentPane.add(lblResult2, gbc_lblResult2);
 
-				textPane_1 = new JTextPane();
-				GridBagConstraints gbc_textPane_1 = new GridBagConstraints();
-				gbc_textPane_1.insets = new Insets(0, 0, 5, 5);
-				gbc_textPane_1.fill = GridBagConstraints.HORIZONTAL;
-				gbc_textPane_1.gridx = 2;
-				gbc_textPane_1.gridy = 3;
-				contentPane.add(textPane_1, gbc_textPane_1);
+			textPane_1 = new JTextPane();
+			GridBagConstraints gbc_textPane_1 = new GridBagConstraints();
+			gbc_textPane_1.insets = new Insets(0, 0, 5, 5);
+			gbc_textPane_1.fill = GridBagConstraints.HORIZONTAL;
+			gbc_textPane_1.gridx = 2;
+			gbc_textPane_1.gridy = 3;
+			contentPane.add(textPane_1, gbc_textPane_1);
 
-				JLabel lblResult3 = new JLabel("Result 3:");
-				GridBagConstraints gbc_lblResult3 = new GridBagConstraints();
-				gbc_lblResult3.insets = new Insets(0, 0, 5, 5);
-				gbc_lblResult3.gridx = 1;
-				gbc_lblResult3.gridy = 4;
-				contentPane.add(lblResult3, gbc_lblResult3);
+			JLabel lblResult3 = new JLabel("Result 3:");
+			GridBagConstraints gbc_lblResult3 = new GridBagConstraints();
+			gbc_lblResult3.insets = new Insets(0, 0, 5, 5);
+			gbc_lblResult3.gridx = 1;
+			gbc_lblResult3.gridy = 4;
+			contentPane.add(lblResult3, gbc_lblResult3);
 
-				textPane_2 = new JTextPane();
-				GridBagConstraints gbc_textPane_2 = new GridBagConstraints();
-				gbc_textPane_2.insets = new Insets(0, 0, 5, 5);
-				gbc_textPane_2.fill = GridBagConstraints.HORIZONTAL;
-				gbc_textPane_2.gridx = 2;
-				gbc_textPane_2.gridy = 4;
-				contentPane.add(textPane_2, gbc_textPane_2);
-			}
-
+			textPane_2 = new JTextPane();
+			GridBagConstraints gbc_textPane_2 = new GridBagConstraints();
+			gbc_textPane_2.insets = new Insets(0, 0, 5, 5);
+			gbc_textPane_2.fill = GridBagConstraints.HORIZONTAL;
+			gbc_textPane_2.gridx = 2;
+			gbc_textPane_2.gridy = 4;
+			contentPane.add(textPane_2, gbc_textPane_2);
 		}
 
 	}
