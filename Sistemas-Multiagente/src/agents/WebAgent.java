@@ -45,7 +45,7 @@ public class WebAgent extends Agent {
     }
 
     protected void takeDown() {
-        System.out.println("[WEB-AGENT] Taking down...");
+        System.out.println("[" + getLocalName() + "] Taking down...");
     }
 
     public class RequestReceiver extends AchieveREResponder {
@@ -64,10 +64,10 @@ public class WebAgent extends Agent {
                 try {
                     data = getData(url);
                 } catch (IOException exception) {
-                    throw new RefuseException("[WEB-AGENT] Refuse exception: error getting information from URL.");
+                    throw new RefuseException("[" + getLocalName() + "] Refuse exception: error getting information from URL.");
                 }
             } else
-                throw new NotUnderstoodException("[WEB-AGENT] NotUnderstoodException: Invalid URL received.");
+                throw new NotUnderstoodException("[" + getLocalName() + "] NotUnderstoodException: Invalid URL received.");
 
             ACLMessage agree = request.createReply();
             agree.setPerformative(ACLMessage.AGREE);
@@ -78,14 +78,14 @@ public class WebAgent extends Agent {
         protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
                 throws FailureException {
 
-            System.out.println("[WEB-AGENT]" + "Preparing result...");
+            System.out.println("[" + getLocalName() + "]" + "Preparing result...");
             ACLMessage inform = request.createReply();
             inform.setPerformative(ACLMessage.INFORM);
 
             try {
                 inform.setContentObject(data);
             } catch (IOException e) {
-                throw new FailureException("[WEB-AGENT] FailureException: serialization error.");
+                throw new FailureException("[" + getLocalName() + "] FailureException: serialization error.");
             }
 
             return inform;

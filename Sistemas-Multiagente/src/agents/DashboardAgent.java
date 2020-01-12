@@ -52,14 +52,19 @@ public class DashboardAgent extends Agent {
 		}
 
 		while (!frame.ready) { // wait until button event
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 
 		System.out.println("[DASHBOARD-AGENT] Received URLs! Sending to processer...");
 
 		ArrayList<String> msgContent = new ArrayList<String>();
-		msgContent.add(WEB_AGENT_1 + ":" + frame.url_1);
-		msgContent.add(WEB_AGENT_2 + ":" + frame.url_2);
-		msgContent.add(WEB_AGENT_3 + ":" + frame.url_3);
+		msgContent.add(WEB_AGENT_1 + ">" + frame.url_1);
+		msgContent.add(WEB_AGENT_2 + ">" + frame.url_2);
+		msgContent.add(WEB_AGENT_3 + ">" + frame.url_3);
 
 		ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
 		msg.addReceiver(new AID(PROCESSER, AID.ISLOCALNAME));
@@ -108,6 +113,9 @@ public class DashboardAgent extends Agent {
 			} catch (UnreadableException e) {
 				System.out.println("[DASHBOARD-AGENT] " + e.getMessage());
 			}
+			
+			System.out.println("[DASHBOARD-AGENT] Showing results...");
+			
 			for (ArrayList<PopulationData> table : info) {
 				for (PopulationData line : table) {
 					System.out.println(line);

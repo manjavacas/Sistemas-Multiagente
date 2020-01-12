@@ -2,6 +2,7 @@ package agents;
 
 import jade.core.Agent;
 import jade.core.behaviours.ParallelBehaviour;
+import jade.core.behaviours.SequentialBehaviour;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,146 +21,160 @@ import jade.domain.FIPAAgentManagement.FailureException;
 
 public class ProcesserAgent extends Agent {
 
-    final static String DASHBOARD = "Dashboard";
-    final static String PROCESSER = "Processer";
+	final static String DASHBOARD = "Dashboard";
+	final static String PROCESSER = "Processer";
 
-    final static int N_WEB_AGENTS = 3;
+	final static int N_WEB_AGENTS = 3;
 
-    private ArrayList<ArrayList<PopulationData>> info = new ArrayList<ArrayList<PopulationData>>();
-    private RequestReceiver requestReceiver;
+	private static ArrayList<ArrayList<PopulationData>> info = new ArrayList<ArrayList<PopulationData>>();
+	private static RequestReceiver requestReceiver;
 
-    protected void setup() {
+	protected void setup() {
 
-        MessageTemplate protocol = MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
-        MessageTemplate performative = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
-        MessageTemplate sender = MessageTemplate.MatchSender(new AID(DASHBOARD, AID.ISLOCALNAME));
-        MessageTemplate temp = MessageTemplate.and(protocol, performative);
-        temp = MessageTemplate.and(temp, sender);
+		MessageTemplate protocol = MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+		MessageTemplate performative = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
+		MessageTemplate sender = MessageTemplate.MatchSender(new AID(DASHBOARD, AID.ISLOCALNAME));
+		MessageTemplate temp = MessageTemplate.and(protocol, performative);
+		temp = MessageTemplate.and(temp, sender);
 
-        requestReceiver = new RequestReceiver(this, temp);
-        addBehaviour(requestReceiver);
-    }
+		requestReceiver = new RequestReceiver(this, temp);
+		addBehaviour(requestReceiver);
+	}
 
-    protected void takeDown() {
-        System.out.println("[PROCESSER] Taking down...");
-    }
+	protected void takeDown() {
+		System.out.println("[PROCESSER] Taking down...");
+	}
 
-    public class RequestReceiver extends AchieveREResponder {
+	public class RequestReceiver extends AchieveREResponder {
 
-        public RequestReceiver(Agent a, MessageTemplate temp) {
-            super(a, temp);
-        }
+		public RequestReceiver(Agent a, MessageTemplate temp) {
+			super(a, temp);
+			System.out.println("[PROCESSER-AGENT] Waiting request...");
+		}
 
-        protected ACLMessage handleRequest(ACLMessage request) throws NotUnderstoodException, RefuseException {
+		protected ACLMessage handleRequest(ACLMessage request) throws NotUnderstoodException, RefuseException {
 
-            System.out.println("[PROCESSER-AGENT] " + request.getSender().getName() + " has sent a request.");
-            ArrayList<String> msgContent = null;
+			System.out.println("[PROCESSER-AGENT] " + request.getSender().getName() + " has sent a request.");
+			ArrayList<String> msgContent = null;
 
-            try {
-                msgContent = (ArrayList<String>) request.getContentObject();
-            } catch (UnreadableException e) {
-                throw new NotUnderstoodException("[PROCESSER-AGENT] Unreadable content of the message.");
-            }
+			try {
+				msgContent = (ArrayList<String>) request.getContentObject();
+			} catch (UnreadableException e) {
+				throw new NotUnderstoodException("[PROCESSER-AGENT] Unreadable content of the message.");
+			}
+			
+			ParallelBehaviour se = new ParallelBehaviour();
 
-            if (msgContent.size() == N_WEB_AGENTS) {
+			if (msgContent.size() == N_WEB_AGENTS) {
+				
+				String webAgentName, webAgentUrl;
 
-                ParallelBehaviour pb = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
-                String webAgentName, webAgentUrl;
+				for (String content : msgContent) {
 
-                for (String content : msgContent) {
+					String[] contentParts = content.split(">");
+					webAgentName = contentParts[0];
+					webAgentUrl = contentParts[1];
 
-                    String[] contentParts = content.split(":");
-                    webAgentName = contentParts[0];
-                    webAgentUrl = contentParts[1];
+					System.out.println(
+							"[PROCESSER-AGENT] URL: " + webAgentUrl + " will be processed by: " + webAgentName);
 
-                    System.out.println(
-                            "[PROCESSER-AGENT] URL: " + webAgentUrl + " will be processed by: " + webAgentName);
+					ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+					msg.addReceiver(new AID((String) webAgentName, AID.ISLOCALNAME));
+					msg.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+					msg.setSender(new AID(PROCESSER, AID.ISLOCALNAME));
+					msg.setContent(webAgentUrl);
 
-                    ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-                    msg.addReceiver(new AID((String) webAgentName, AID.ISLOCALNAME));
-                    msg.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
-                    msg.setSender(new AID(PROCESSER, AID.ISLOCALNAME));
-                    msg.setContent(webAgentUrl);
+					se.addSubBehaviour(new RequestInitiator(myAgent, msg));
+				}
 
-                    pb.addSubBehaviour(new RequestInitiator(this, msg));
-                }
+			} else {
+				throw new RefuseException("[PROCESSER-AGENT] The message content contains information for "
+						+ msgContent.size() + " web agents but " + N_WEB_AGENTS + " web agents are needed!");
+			}
 
-                addBehaviour(pb);
+			this.registerPrepareResultNotification(se);
 
-            } else {
-                throw new RefuseException("[PROCESSER-AGENT] The message content contains information for "
-                        + msgContent.size() + " web agents but " + N_WEB_AGENTS + " web agents are needed!");
-            }
+			ACLMessage agree = request.createReply();
+			agree.setPerformative(ACLMessage.AGREE);
+			return agree;
+		}
 
-            this.block();
+		protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
+				throws FailureException {
 
-            ACLMessage agree = request.createReply();
-            agree.setPerformative(ACLMessage.AGREE);
-            return agree;
-        }
+			System.out.println("[PROCESSER-AGENT] Preparing result...");
+			ACLMessage inform = request.createReply();
+			inform.setPerformative(ACLMessage.INFORM);
 
-        protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
-                throws FailureException {
+			try {
+				inform.setContentObject(info);
+			} catch (IOException e) {
+				throw new FailureException("[PROCESSER-AGENT] FailureException: serialization error.");
+			}
 
-            System.out.println("[PROCESSER-AGENT] Preparing result...");
-            ACLMessage inform = request.createReply();
-            inform.setPerformative(ACLMessage.INFORM);
+			return inform;
+		}
 
-            try {
-                inform.setContentObject(info);
-            } catch (IOException e) {
-                throw new FailureException("[PROCESSER-AGENT] FailureException: serialization error.");
-            }
+	}
 
-            return inform;
-        }
+	public static class RequestInitiator extends AchieveREInitiator {
 
-    }
+		private static int count = 0;
 
-    public class RequestInitiator extends AchieveREInitiator {
+		public RequestInitiator(Agent a, ACLMessage msg) {
+			super(a, msg);
+		}
 
-        private int count = 0;
+		protected void handleAgree(ACLMessage agree) {
+			System.out.println("[PROCESSER-AGENT] " + agree.getSender().getName() + " has accepted the request.");
+		}
 
-        public RequestInitiator(Agent a, ACLMessage msg) {
-            super(a, msg);
-        }
+		protected void handleRefuse(ACLMessage refuse) {
+			System.out.println("[PROCESSER-AGENT] " + refuse.getSender().getName() + " has rejected the request.");
+		}
 
-        protected void handleAgree(ACLMessage agree) {
-            System.out.println("[PROCESSER] " + agree.getSender().getName() + " has accepted the request.");
-        }
+		protected void handleNotUnderstood(ACLMessage notUnderstood) {
+			System.out.println(
+					"[PROCESSER-AGENT] " + notUnderstood.getSender().getName() + " didn't understood the request.");
+		}
 
-        protected void handleRefuse(ACLMessage refuse) {
-            System.out.println("[PROCESSER] " + refuse.getSender().getName() + " has rejected the request.");
-        }
+		protected void handleInform(ACLMessage inform) {
+			
+			count++;
 
-        protected void handleNotUnderstood(ACLMessage notUnderstood) {
-            System.out
-                    .println("[PROCESSER] " + notUnderstood.getSender().getName() + " didn't understood the request.");
-        }
+			System.out.println("[PROCESSER-AGENT] Received results from " + inform.getSender().getName());
 
-        protected void handleInform(ACLMessage inform) {
+			ArrayList<PopulationData> table = null;
+			try {
+				table = (ArrayList<PopulationData>) inform.getContentObject();
+			} catch (UnreadableException e) {
+				System.out.println(e.getMessage());
+			}
 
-            count++;
-            System.out.println("[PROCESSER] Received results from " + inform.getSender().getName());
+			info.add(table);
+			
+			if (count >= 3) {
+				AchieveREResponder resp = (AchieveREResponder) requestReceiver;
+				String incomingRequestkey = (String) resp.REQUEST_KEY;
+				ACLMessage incomingRequest = (ACLMessage) resp.getDataStore().get(incomingRequestkey);
+				// Prepare the notification to the request originator and store it in the DataStore
+				ACLMessage notification = incomingRequest.createReply();
+				notification.setPerformative(ACLMessage.INFORM);
+				try {
+					notification.setContentObject(info);
+				} catch (IOException e) {
+					System.out.println(e.getMessage());
+				}
+				String notificationkey = (String) resp.RESULT_NOTIFICATION_KEY;
+				resp.getDataStore().put(notificationkey, notification);
+			}
 
-            ArrayList<PopulationData> table = null;
-            try {
-                table = (ArrayList<PopulationData>) inform.getContentObject();
-            } catch (UnreadableException e) {
-                System.out.println(e.getMessage());
-            }
+		}
 
-            info.add(table);
+		protected void handleFailure(ACLMessage failure) {
+			System.out.println("[PROCESSER-AGENT] " + failure.getSender().getName() + " has failed!");
+		}
 
-            if (count >= N_WEB_AGENTS) {
-                requestReceiver.restart();
-            }
-        }
-
-        protected void handleFailure(ACLMessage failure) {
-            System.out.println("[PROCESSER] " + failure.getSender().getName() + " has failed!");
-        }
-
-    }
+	}
 
 }
