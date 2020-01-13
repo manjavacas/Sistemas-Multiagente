@@ -14,8 +14,6 @@ import jade.domain.FIPANames;
 
 // Interface imports
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -76,7 +74,7 @@ public class DashboardAgent extends Agent {
 		try {
 			msg.setContentObject(msgContent);
 		} catch (IOException e) {
-			System.out.println("[DASHBOARD-AGENT] " + e.getMessage());
+			System.out.println("[DASHBOARD-AGENT] Error in the urls encapsulation.");
 		}
 
 		addBehaviour(new RequestInitiator(this, msg));
@@ -98,11 +96,13 @@ public class DashboardAgent extends Agent {
 
 		protected void handleRefuse(ACLMessage refuse) {
 			System.out.println("[DASHBOARD-AGENT] " + refuse.getSender().getName() + " has rejected the request.");
+			System.out.println("[DASHBOARD-AGENT] Reason - " + refuse.getContent());
 		}
 
 		protected void handleNotUnderstood(ACLMessage notUnderstood) {
 			System.out.println(
 					"[DASHBOARD-AGENT] " + notUnderstood.getSender().getName() + " didn't understood the request.");
+			System.out.println("[DASHBOARD-AGENT] Reason - " + notUnderstood.getContent());
 		}
 
 		protected void handleInform(ACLMessage inform) {
@@ -114,12 +114,14 @@ public class DashboardAgent extends Agent {
 			try {
 				info = (ArrayList<PopulationData>) inform.getContentObject();
 			} catch (UnreadableException e) {
-				System.out.println("[DASHBOARD-AGENT] " + e.getMessage());
+				System.out.println("[DASHBOARD-AGENT] Error unpacking message");
 			}
 
 			Summary sum = null;
 
 			try {
+				System.out.println("[DASHBOARD-AGENT] Showing results");
+				
 				sum = new Summary();
 				sum.textPane.setText(info.get(0).toString());
 				sum.textPane_1.setText(info.get(1).toString());
@@ -133,6 +135,7 @@ public class DashboardAgent extends Agent {
 
 		protected void handleFailure(ACLMessage failure) {
 			System.out.println("[DASHBOARD-AGENT] " + failure.getSender().getName() + " failed during execution!");
+			System.out.println("[DASHBOARD-AGENT] Reason - " + failure.getContent());
 		}
 
 	}
@@ -179,7 +182,7 @@ public class DashboardAgent extends Agent {
 			panel.setLayout(gbl_panel);
 
 			JLabel lblTitle = new JLabel("Enter URLs for each agent");
-			lblTitle.setFont(new Font("Tahoma", Font.BOLD, 14));
+			lblTitle.setFont(new Font("Tahoma", Font.BOLD, 24));
 			GridBagConstraints gbc_lblTitle = new GridBagConstraints();
 			gbc_lblTitle.gridwidth = 2;
 			gbc_lblTitle.insets = new Insets(0, 0, 5, 5);
@@ -188,6 +191,7 @@ public class DashboardAgent extends Agent {
 			panel.add(lblTitle, gbc_lblTitle);
 
 			JLabel lblUrl1 = new JLabel("URL 1");
+			lblUrl1.setFont(new Font("Tahoma", Font.BOLD, 14));
 			GridBagConstraints gbc_lblUrl1 = new GridBagConstraints();
 			gbc_lblUrl1.insets = new Insets(0, 0, 5, 5);
 			gbc_lblUrl1.gridx = 1;
@@ -195,6 +199,7 @@ public class DashboardAgent extends Agent {
 			panel.add(lblUrl1, gbc_lblUrl1);
 
 			textField1 = new JTextField(default_url_1);
+			textField1.setFont(new Font("Tahoma", Font.PLAIN, 15));
 			GridBagConstraints gbc_textField1 = new GridBagConstraints();
 			gbc_textField1.fill = GridBagConstraints.HORIZONTAL;
 			gbc_textField1.insets = new Insets(0, 0, 5, 5);
@@ -204,6 +209,7 @@ public class DashboardAgent extends Agent {
 			textField1.setColumns(10);
 
 			JLabel lblUrl2 = new JLabel("URL 2");
+			lblUrl2.setFont(new Font("Tahoma", Font.BOLD, 14));
 			GridBagConstraints gbc_lblUrl2 = new GridBagConstraints();
 			gbc_lblUrl2.insets = new Insets(0, 0, 5, 5);
 			gbc_lblUrl2.gridx = 1;
@@ -211,6 +217,7 @@ public class DashboardAgent extends Agent {
 			panel.add(lblUrl2, gbc_lblUrl2);
 
 			textField2 = new JTextField(default_url_2);
+			textField2.setFont(new Font("Tahoma", Font.PLAIN, 15));
 			GridBagConstraints gbc_textField2 = new GridBagConstraints();
 			gbc_textField2.fill = GridBagConstraints.HORIZONTAL;
 			gbc_textField2.insets = new Insets(0, 0, 5, 5);
@@ -220,6 +227,7 @@ public class DashboardAgent extends Agent {
 			textField2.setColumns(10);
 
 			JLabel lblUrl3 = new JLabel("URL 3");
+			lblUrl3.setFont(new Font("Tahoma", Font.BOLD, 14));
 			GridBagConstraints gbc_lblUrl3 = new GridBagConstraints();
 			gbc_lblUrl3.insets = new Insets(0, 0, 5, 5);
 			gbc_lblUrl3.gridx = 1;
@@ -227,6 +235,7 @@ public class DashboardAgent extends Agent {
 			panel.add(lblUrl3, gbc_lblUrl3);
 
 			textField3 = new JTextField(default_url_3);
+			textField3.setFont(new Font("Tahoma", Font.PLAIN, 15));
 			GridBagConstraints gbc_textField3 = new GridBagConstraints();
 			gbc_textField3.insets = new Insets(0, 0, 5, 5);
 			gbc_textField3.fill = GridBagConstraints.HORIZONTAL;
@@ -236,6 +245,7 @@ public class DashboardAgent extends Agent {
 			textField3.setColumns(10);
 
 			JButton btnProcess = new JButton("Process");
+			btnProcess.setFont(new Font("Sitka Text", Font.BOLD, 25));
 			btnProcess.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					url_1 = textField1.getText();
@@ -285,7 +295,7 @@ public class DashboardAgent extends Agent {
 			contentPane.setLayout(gbl_contentPane);
 
 			JLabel lblTitle = new JLabel("Most populated years obtained...");
-			lblTitle.setFont(new Font("Tahoma", Font.BOLD, 15));
+			lblTitle.setFont(new Font("Tahoma", Font.BOLD, 24));
 			GridBagConstraints gbc_lblTitle = new GridBagConstraints();
 			gbc_lblTitle.gridwidth = 2;
 			gbc_lblTitle.insets = new Insets(0, 0, 5, 5);
@@ -294,6 +304,7 @@ public class DashboardAgent extends Agent {
 			contentPane.add(lblTitle, gbc_lblTitle);
 
 			JLabel lblResult1 = new JLabel("Result 1:");
+			lblResult1.setFont(new Font("Tahoma", Font.BOLD, 14));
 			GridBagConstraints gbc_lblResult1 = new GridBagConstraints();
 			gbc_lblResult1.insets = new Insets(0, 0, 5, 5);
 			gbc_lblResult1.gridx = 1;
@@ -301,6 +312,8 @@ public class DashboardAgent extends Agent {
 			contentPane.add(lblResult1, gbc_lblResult1);
 
 			textPane = new JTextPane();
+			textPane.setEditable(false);
+			textPane.setFont(new Font("Tahoma", Font.PLAIN, 15));
 			GridBagConstraints gbc_textPane = new GridBagConstraints();
 			gbc_textPane.insets = new Insets(0, 0, 5, 5);
 			gbc_textPane.fill = GridBagConstraints.HORIZONTAL;
@@ -309,6 +322,7 @@ public class DashboardAgent extends Agent {
 			contentPane.add(textPane, gbc_textPane);
 
 			JLabel lblResult2 = new JLabel("Result 2:");
+			lblResult2.setFont(new Font("Tahoma", Font.BOLD, 14));
 			GridBagConstraints gbc_lblResult2 = new GridBagConstraints();
 			gbc_lblResult2.insets = new Insets(0, 0, 5, 5);
 			gbc_lblResult2.gridx = 1;
@@ -316,6 +330,8 @@ public class DashboardAgent extends Agent {
 			contentPane.add(lblResult2, gbc_lblResult2);
 
 			textPane_1 = new JTextPane();
+			textPane_1.setEditable(false);
+			textPane_1.setFont(new Font("Tahoma", Font.PLAIN, 15));
 			GridBagConstraints gbc_textPane_1 = new GridBagConstraints();
 			gbc_textPane_1.insets = new Insets(0, 0, 5, 5);
 			gbc_textPane_1.fill = GridBagConstraints.HORIZONTAL;
@@ -324,6 +340,7 @@ public class DashboardAgent extends Agent {
 			contentPane.add(textPane_1, gbc_textPane_1);
 
 			JLabel lblResult3 = new JLabel("Result 3:");
+			lblResult3.setFont(new Font("Tahoma", Font.BOLD, 14));
 			GridBagConstraints gbc_lblResult3 = new GridBagConstraints();
 			gbc_lblResult3.insets = new Insets(0, 0, 5, 5);
 			gbc_lblResult3.gridx = 1;
@@ -331,6 +348,8 @@ public class DashboardAgent extends Agent {
 			contentPane.add(lblResult3, gbc_lblResult3);
 
 			textPane_2 = new JTextPane();
+			textPane_2.setEditable(false);
+			textPane_2.setFont(new Font("Tahoma", Font.PLAIN, 15));
 			GridBagConstraints gbc_textPane_2 = new GridBagConstraints();
 			gbc_textPane_2.insets = new Insets(0, 0, 5, 5);
 			gbc_textPane_2.fill = GridBagConstraints.HORIZONTAL;

@@ -2,8 +2,6 @@ package agents;
 
 import jade.core.Agent;
 import jade.core.behaviours.ParallelBehaviour;
-import jade.core.behaviours.SequentialBehaviour;
-
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -17,7 +15,6 @@ import jade.proto.AchieveREInitiator;
 import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
-import jade.domain.FIPAAgentManagement.FailureException;
 
 public class ProcesserAgent extends Agent {
 
@@ -42,7 +39,7 @@ public class ProcesserAgent extends Agent {
 	}
 
 	protected void takeDown() {
-		System.out.println("[PROCESSER] Taking down...");
+		System.out.println("[PROCESSER-AGENT] Taking down...");
 	}
 
 	public class RequestReceiver extends AchieveREResponder {
@@ -60,7 +57,7 @@ public class ProcesserAgent extends Agent {
 			try {
 				msgContent = (ArrayList<String>) request.getContentObject();
 			} catch (UnreadableException e) {
-				throw new NotUnderstoodException("[PROCESSER-AGENT] Unreadable content of the message.");
+				throw new NotUnderstoodException("[PROCESSER-AGENT] NotUnderstoodException: unreadable content of the message.");
 			}
 
 			ParallelBehaviour pb = new ParallelBehaviour();
@@ -88,7 +85,7 @@ public class ProcesserAgent extends Agent {
 				}
 
 			} else {
-				throw new RefuseException("[PROCESSER-AGENT] The message content contains information for "
+				throw new RefuseException("[PROCESSER-AGENT] RefuseException: the message content contains information for "
 						+ msgContent.size() + " web agents but " + N_WEB_AGENTS + " web agents are needed!");
 			}
 
@@ -97,22 +94,6 @@ public class ProcesserAgent extends Agent {
 			ACLMessage agree = request.createReply();
 			agree.setPerformative(ACLMessage.AGREE);
 			return agree;
-		}
-
-		protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response)
-				throws FailureException {
-
-			System.out.println("[PROCESSER-AGENT] Preparing result...");
-			ACLMessage inform = request.createReply();
-			inform.setPerformative(ACLMessage.INFORM);
-
-			try {
-				inform.setContentObject(maxPopulationsList);
-			} catch (IOException e) {
-				throw new FailureException("[PROCESSER-AGENT] FailureException: serialization error.");
-			}
-
-			return inform;
 		}
 
 	}
@@ -131,11 +112,13 @@ public class ProcesserAgent extends Agent {
 
 		protected void handleRefuse(ACLMessage refuse) {
 			System.out.println("[PROCESSER-AGENT] " + refuse.getSender().getName() + " has rejected the request.");
+			System.out.println("[PROCESSER-AGENT] Reason - " + refuse.getContent());
 		}
 
 		protected void handleNotUnderstood(ACLMessage notUnderstood) {
 			System.out.println(
 					"[PROCESSER-AGENT] " + notUnderstood.getSender().getName() + " didn't understood the request.");
+			System.out.println("[PROCESSER-AGENT] Reason - " + notUnderstood.getContent());
 		}
 
 		protected void handleInform(ACLMessage inform) {
@@ -166,9 +149,10 @@ public class ProcesserAgent extends Agent {
 			maxPopulationsList.add(greatest);
 
 			if (count >= N_WEB_AGENTS) {
-				AchieveREResponder resp = (AchieveREResponder) requestReceiver;
-				String incomingRequestkey = (String) resp.REQUEST_KEY;
-				ACLMessage incomingRequest = (ACLMessage) resp.getDataStore().get(incomingRequestkey);
+				System.out.println("[PROCESSER-AGENT] Preparing result...");
+				
+				String incomingRequestkey = (String) requestReceiver.REQUEST_KEY;
+				ACLMessage incomingRequest = (ACLMessage) requestReceiver.getDataStore().get(incomingRequestkey);
 				// Prepare the notification to the request originator and store it in the
 				// DataStore
 				ACLMessage notification = incomingRequest.createReply();
@@ -178,14 +162,15 @@ public class ProcesserAgent extends Agent {
 				} catch (IOException e) {
 					System.out.println(e.getMessage());
 				}
-				String notificationkey = (String) resp.RESULT_NOTIFICATION_KEY;
-				resp.getDataStore().put(notificationkey, notification);
+				String notificationkey = (String) requestReceiver.RESULT_NOTIFICATION_KEY;
+				requestReceiver.getDataStore().put(notificationkey, notification);
 			}
 
 		}
 
 		protected void handleFailure(ACLMessage failure) {
 			System.out.println("[PROCESSER-AGENT] " + failure.getSender().getName() + " has failed!");
+			System.out.println("[PROCESSER-AGENT] Reason - " + failure.getContent());
 		}
 
 	}
