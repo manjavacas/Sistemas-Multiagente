@@ -57,7 +57,8 @@ public class ProcesserAgent extends Agent {
 			try {
 				msgContent = (ArrayList<String>) request.getContentObject();
 			} catch (UnreadableException e) {
-				throw new NotUnderstoodException("[PROCESSER-AGENT] NotUnderstoodException: unreadable content of the message.");
+				throw new NotUnderstoodException(
+						"[PROCESSER-AGENT] NotUnderstoodException: unreadable content of the message.");
 			}
 
 			ParallelBehaviour pb = new ParallelBehaviour();
@@ -85,8 +86,9 @@ public class ProcesserAgent extends Agent {
 				}
 
 			} else {
-				throw new RefuseException("[PROCESSER-AGENT] RefuseException: the message content contains information for "
-						+ msgContent.size() + " web agents but " + N_WEB_AGENTS + " web agents are needed!");
+				throw new RefuseException(
+						"[PROCESSER-AGENT] RefuseException: the message content contains information for "
+								+ msgContent.size() + " web agents but " + N_WEB_AGENTS + " web agents are needed!");
 			}
 
 			this.registerPrepareResultNotification(pb);
@@ -150,7 +152,7 @@ public class ProcesserAgent extends Agent {
 
 			if (count >= N_WEB_AGENTS) {
 				System.out.println("[PROCESSER-AGENT] Preparing result...");
-				
+
 				String incomingRequestkey = (String) requestReceiver.REQUEST_KEY;
 				ACLMessage incomingRequest = (ACLMessage) requestReceiver.getDataStore().get(incomingRequestkey);
 				// Prepare the notification to the request originator and store it in the

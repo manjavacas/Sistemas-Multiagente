@@ -121,7 +121,7 @@ public class DashboardAgent extends Agent {
 
 			try {
 				System.out.println("[DASHBOARD-AGENT] Showing results");
-				
+
 				sum = new Summary();
 				sum.textPane.setText(info.get(0).toString());
 				sum.textPane_1.setText(info.get(1).toString());
@@ -266,7 +266,7 @@ public class DashboardAgent extends Agent {
 		}
 
 	}
-	
+
 	/* Output information form */
 	class Summary extends JFrame {
 
