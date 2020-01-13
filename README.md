@@ -5,4 +5,4 @@ Práctica de la asignatura Sistemas Multiagente. Curso 2019/2020.
 - Rubén Márquez
 
 ## Documentación
-- [Documentación del proyecto](doc/SMA_Manjavacas_Marquez.pdf)
+- [Documentación del proyecto](Sistemas-Multiagente/doc/SMA_Manjavacas_Marquez.pdf)
