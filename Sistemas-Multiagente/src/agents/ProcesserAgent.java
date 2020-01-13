@@ -63,7 +63,7 @@ public class ProcesserAgent extends Agent {
 				throw new NotUnderstoodException("[PROCESSER-AGENT] Unreadable content of the message.");
 			}
 
-			ParallelBehaviour se = new ParallelBehaviour();
+			ParallelBehaviour pb = new ParallelBehaviour();
 
 			if (msgContent.size() == N_WEB_AGENTS) {
 
@@ -84,7 +84,7 @@ public class ProcesserAgent extends Agent {
 					msg.setSender(new AID(PROCESSER, AID.ISLOCALNAME));
 					msg.setContent(webAgentUrl);
 
-					se.addSubBehaviour(new RequestInitiator(myAgent, msg));
+					pb.addSubBehaviour(new RequestInitiator(myAgent, msg));
 				}
 
 			} else {
@@ -92,7 +92,7 @@ public class ProcesserAgent extends Agent {
 						+ msgContent.size() + " web agents but " + N_WEB_AGENTS + " web agents are needed!");
 			}
 
-			this.registerPrepareResultNotification(se);
+			this.registerPrepareResultNotification(pb);
 
 			ACLMessage agree = request.createReply();
 			agree.setPerformative(ACLMessage.AGREE);
